@@ -47,7 +47,7 @@
 
 ### 001 프로젝트 생성
 
-- **[링크](LINK:001)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/b9c57f7d4f8f898a59db2e6cdf02b6301acdf272)**
 - **원인** : 아무것도 없는 저장소에서 시작하므로 실행할 수 있는 Next.js 프로젝트와, 기능마다 테스트를 먼저 쓰기 위한 테스트 환경이 필요하다.
 - **작업**
   - 추가 : `create-next-app` 템플릿 — TypeScript, App Router, `src/` 폴더, Tailwind CSS, ESLint, Turbopack, 경로 별칭 `@/*`
@@ -63,3 +63,13 @@
   - 브라우저에서 읽는 환경 변수는 이름이 `NEXT_PUBLIC_` 으로 시작해야 한다 (20강). 비밀 값이 아니므로 `.env` 를 버전 관리에 넣는다 (`.gitignore` 에 `!.env`).
   - `.gitattributes` 로 텍스트 파일의 줄바꿈을 LF 로 고정해 Windows 에서도 섞이지 않게 한다.
   - 결과 : 아직 테스트 파일은 없다. `npm run build` 통과.
+
+### 002-1 홈 테스트 추가 (실패)
+
+- **[링크](LINK:002-1)**
+- **원인** : 첫 화면과, 모든 페이지 위에 보일 메뉴가 필요하다. 먼저 보여야 할 내용을 테스트로 정한다.
+- **작업**
+  - 추가 : 테스트 `home.test.tsx` — 메인 페이지에 `안녕하세요.` 가 보이는지, 헤더에 `메인`(`/`)·`글 목록`(`/posts`) 링크가 있는지 확인
+- **설명**
+  - 헤더를 `layout.tsx` 안에 두면 `<html>`·`<body>` 까지 함께 그려야 해서 테스트하기 어렵다. 그래서 `SiteHeader` 컴포넌트로 떼어 테스트한다.
+  - 실패 확인 : `SiteHeader` 가 없어 `Failed to resolve import "@/components/SiteHeader"` 로 실패한다.
