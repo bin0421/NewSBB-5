@@ -1,5 +1,6 @@
 "use client";
 
+import PostCommentSection from "@/components/PostCommentSection";
 import { apiFetch } from "@/lib/backend/client";
 import type { PostWithContentDto } from "@/type/post";
 import Link from "next/link";
@@ -52,6 +53,10 @@ export default function Page() {
           수정
         </Link>
       </div>
+
+      <hr className="my-2" />
+
+      <PostCommentSection postId={id} />
     </>
   );
 }
