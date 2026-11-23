@@ -130,7 +130,7 @@
 
 ### 004-2 글 단건조회
 
-- **[링크](LINK:004-2)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/19d32281b16ecba79e4ab3d44a25ecdd96ecd3ae)**
 - **원인** : 004-1 테스트가 실패한다. 상세 페이지가 없다.
 - **작업**
   - 추가 : 글 상세 페이지 `/posts/[id]` (`src/app/posts/[id]/page.tsx`)
@@ -141,3 +141,13 @@
   - 내용은 `white-space: pre-line` 으로 줄바꿈을 살려 보여준다.
   - `loading.tsx` 는 16강처럼 이 경로의 페이지를 준비하는 동안 보여줄 화면이다. 하위 경로인 수정 페이지(007)도 함께 감싼다.
   - 결과 : 테스트 11개 통과.
+
+### 005-1 글 삭제 테스트 추가 (실패)
+
+- **[링크](LINK:005-1)**
+- **원인** : 상세 페이지에서 글을 지울 수 있어야 한다.
+- **작업**
+  - 추가 : 테스트 `postDelete.test.tsx` — `삭제` 를 누르면 `1번 글을 정말로 삭제하시겠습니까?` 확인창, 확인하면 `DELETE /api/v1/posts/1` 호출, 응답 메세지 `alert`, `/posts` 로 `router.replace` / 취소하면 호출도 이동도 없는지 확인
+- **설명**
+  - `window.confirm`·`window.alert` 는 `vi.spyOn` 으로 바꿔 반환값을 정하고 호출 내용을 확인한다.
+  - 실패 확인 : 삭제 버튼이 없어 `Unable to find role="button" and name "삭제"` 로 2개 테스트가 실패한다.
