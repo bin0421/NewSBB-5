@@ -119,7 +119,7 @@
 
 ### 004-1 글 단건조회 테스트 추가 (실패)
 
-- **[링크](LINK:004-1)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/d1178b586388967dfc4cefb5faa8198f984c4310)**
 - **원인** : 목록의 글을 누르면 `GET /api/v1/posts/{id}` 로 한 건을 불러와 보여줘야 한다.
 - **작업**
   - 추가 : 테스트 도우미 `mockNavigation.ts` — `next/navigation` 의 `useRouter`·`useParams` 를 가짜로 바꾸고, `router.replace` 등의 호출을 기록
@@ -127,3 +127,17 @@
 - **설명**
   - 테스트에는 Next.js 라우터가 없으므로 주소 파라미터와 페이지 이동을 가짜로 바꾼다. 테스트 파일마다 `vi.mock("next/navigation", ...)` 으로 이 도우미를 연결한다.
   - 실패 확인 : `@/app/posts/[id]/page` 가 없어 import 에서 실패한다.
+
+### 004-2 글 단건조회
+
+- **[링크](LINK:004-2)**
+- **원인** : 004-1 테스트가 실패한다. 상세 페이지가 없다.
+- **작업**
+  - 추가 : 글 상세 페이지 `/posts/[id]` (`src/app/posts/[id]/page.tsx`)
+  - 추가 : `src/app/posts/[id]/loading.tsx` — `로딩중...`
+- **설명**
+  - `useParams()` 로 주소의 `id` 를 문자열로 받아 `Number()` 로 바꾼다.
+  - `post == null` 이면 먼저 `로딩중...` 을 돌려주는 가드 클로즈(early return)로 중첩을 줄인다 (18강).
+  - 내용은 `white-space: pre-line` 으로 줄바꿈을 살려 보여준다.
+  - `loading.tsx` 는 16강처럼 이 경로의 페이지를 준비하는 동안 보여줄 화면이다. 하위 경로인 수정 페이지(007)도 함께 감싼다.
+  - 결과 : 테스트 11개 통과.
