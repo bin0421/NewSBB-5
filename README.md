@@ -66,10 +66,27 @@
 
 ### 002-1 홈 테스트 추가 (실패)
 
-- **[링크](LINK:002-1)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/a92032949c8f1e1c7abe41f0d698462d6ffa9843)**
 - **원인** : 첫 화면과, 모든 페이지 위에 보일 메뉴가 필요하다. 먼저 보여야 할 내용을 테스트로 정한다.
 - **작업**
   - 추가 : 테스트 `home.test.tsx` — 메인 페이지에 `안녕하세요.` 가 보이는지, 헤더에 `메인`(`/`)·`글 목록`(`/posts`) 링크가 있는지 확인
 - **설명**
   - 헤더를 `layout.tsx` 안에 두면 `<html>`·`<body>` 까지 함께 그려야 해서 테스트하기 어렵다. 그래서 `SiteHeader` 컴포넌트로 떼어 테스트한다.
   - 실패 확인 : `SiteHeader` 가 없어 `Failed to resolve import "@/components/SiteHeader"` 로 실패한다.
+
+### 002-2 홈
+
+- **[링크](LINK:002-2)**
+- **원인** : 002-1 테스트가 실패한다. 헤더 컴포넌트가 없고 메인 페이지는 템플릿 소개 화면 그대로다.
+- **작업**
+  - 추가 : `SiteHeader` — `메인`, `글 목록` 링크
+  - 수정 : 메인 페이지 `src/app/page.tsx`
+    - 이전 : 템플릿 소개 화면
+    - 이후 : 화면 가운데 `안녕하세요.`
+  - 수정 : `src/app/layout.tsx`
+    - 이전 : `lang="en"`, 제목 `Create Next App`, `<body>` 에 페이지만
+    - 이후 : `lang="ko"`, 제목 `사이트 A`, `<body>` 에 `SiteHeader` + `<main>`(페이지) + 푸터
+- **설명**
+  - `next/link` 의 `Link` 는 `<a>` 와 달리 페이지 전체를 다시 불러오지 않고 바뀐 부분만 다시 그린다 (7강).
+  - `<body>` 를 `flex flex-col min-h-screen`, `<main>` 을 `flex-grow` 로 두어 내용이 짧아도 푸터가 화면 맨 아래에 붙는다.
+  - 결과 : 테스트 2개 통과.
