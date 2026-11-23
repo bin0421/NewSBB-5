@@ -15,3 +15,9 @@ export type PostCommentDto = {
   modifyDate: string;
   content: string;
 };
+
+export type RsData<T> = {
+  resultCode: string;
+  msg: string;
+  data: T;
+};

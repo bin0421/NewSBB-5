@@ -165,10 +165,23 @@
 
 ### 006-1 글 작성 테스트 추가 (실패)
 
-- **[링크](LINK:006-1)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/ca23eef5bf955b629658e2c199ab994f952251bc)**
 - **원인** : 새 글을 쓸 페이지가 필요하다.
 - **작업**
   - 추가 : 테스트 `postWrite.test.tsx` — 제목이 공백뿐이면 `제목을 입력해주세요.` 경고와 제목 칸 포커스, 내용이 비면 `내용을 입력해주세요.` 경고와 내용 칸 포커스, 올바르면 앞뒤 공백을 뺀 `{title, content}` 로 `POST /api/v1/posts`, 응답 메세지 `alert`, 새 글 `/posts/3` 으로 `router.replace` 확인
 - **설명**
   - `user-event` 로 사람이 입력하듯 글자를 치고 버튼을 누른다.
   - 실패 확인 : `@/app/posts/write/page` 가 없어 import 에서 실패한다.
+
+### 006-2 글 작성
+
+- **[링크](LINK:006-2)**
+- **원인** : 006-1 테스트가 실패한다. 글쓰기 페이지가 없다.
+- **작업**
+  - 추가 : 글쓰기 페이지 `/posts/write` (`src/app/posts/write/page.tsx`)
+  - 추가 : 타입 `RsData<T>` — `resultCode`, `msg`, `data`
+- **설명**
+  - 폼 전송 때 `form.elements.namedItem("title")` 로 입력 칸을 찾아 값을 읽는다. `useState` 없이 입력 칸의 값을 그대로 쓰는 방식이다 (22강).
+  - 값을 `trim()` 해서 입력 칸에 다시 넣은 뒤 검사하므로, 서버로는 앞뒤 공백이 없는 값이 간다.
+  - 백엔드는 작성 결과를 `RsData` 로 감싸 준다. 새 글 번호는 `data.data.id` 다 (23·25강).
+  - 결과 : 테스트 16개 통과.
