@@ -105,7 +105,7 @@
 
 ### 003-2 글 다건조회
 
-- **[링크](LINK:003-2)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/ad7f9b0164c5b6c9caf7f506300fd078ac4fffc9)**
 - **원인** : 003-1 테스트가 실패한다. API 호출 함수, 응답 타입, 글 목록 페이지가 없다.
 - **작업**
   - 추가 : `apiFetch(url, options)` (`src/lib/backend/client.ts`)
@@ -116,3 +116,14 @@
   - 타입 필드는 백엔드 `PostDto`·`PostCommentDto` 와 같다. 목록에는 내용이 필요 없으므로 `PostDto` 에는 `content` 를 두지 않고, 상세용 `PostWithContentDto` 는 `&` 로 `content` 를 더한다 (19강).
   - 페이지는 `"use client"` 클라이언트 컴포넌트다. `useEffect` 에서 불러와 `useState` 에 넣는다. 상태 초기값을 빈 배열이 아닌 `null` 로 두어 로딩중과 글 없음을 구분한다 (31강).
   - 결과 : 테스트 9개 통과.
+
+### 004-1 글 단건조회 테스트 추가 (실패)
+
+- **[링크](LINK:004-1)**
+- **원인** : 목록의 글을 누르면 `GET /api/v1/posts/{id}` 로 한 건을 불러와 보여줘야 한다.
+- **작업**
+  - 추가 : 테스트 도우미 `mockNavigation.ts` — `next/navigation` 의 `useRouter`·`useParams` 를 가짜로 바꾸고, `router.replace` 등의 호출을 기록
+  - 추가 : 테스트 `postDetail.test.tsx` — 처음에는 `로딩중...`, 주소의 `id` 로 불러와 `글 상세페이지` 제목, `번호 : 1`, `제목: 제목 1`, 줄바꿈이 있는 내용이 보이는지 확인
+- **설명**
+  - 테스트에는 Next.js 라우터가 없으므로 주소 파라미터와 페이지 이동을 가짜로 바꾼다. 테스트 파일마다 `vi.mock("next/navigation", ...)` 으로 이 도우미를 연결한다.
+  - 실패 확인 : `@/app/posts/[id]/page` 가 없어 import 에서 실패한다.
