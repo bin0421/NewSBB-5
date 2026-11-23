@@ -280,7 +280,7 @@
 
 ### 010-2 댓글 작성
 
-- **[링크](LINK:010-2)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/a2ec6d607d97be30a36fb158437debc91f985a94)**
 - **원인** : 010-1 테스트가 실패한다. 댓글 작성 폼이 없다.
 - **작업**
   - 수정 : `PostCommentSection` — 댓글 목록 위에 `댓글 작성` 폼과 `handleCommentWriteFormSubmit` 추가
