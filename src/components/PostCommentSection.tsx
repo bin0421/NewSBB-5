@@ -1,7 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/backend/client";
-import type { PostCommentDto } from "@/type/post";
+import type { PostCommentDto, RsData } from "@/type/post";
 import { useEffect, useState } from "react";
 
 export default function PostCommentSection({ postId }: { postId: number }) {
@@ -9,6 +9,19 @@ export default function PostCommentSection({ postId }: { postId: number }) {
   const [postComments, setPostComments] = useState<PostCommentDto[] | null>(
     null,
   );
+
+  const deleteComment = (commentId: number) => {
+    apiFetch(`/api/v1/posts/${postId}/comments/${commentId}`, {
+      method: "DELETE",
+    }).then((data: RsData<null>) => {
+      alert(data.msg);
+
+      // 요청이 성공하면 상태에서도 제거하여 UI 에 바로 반영
+      setPostComments(
+        (prev) => prev?.filter((c) => c.id != commentId) ?? prev,
+      );
+    });
+  };
 
   useEffect(() => {
     apiFetch(`/api/v1/posts/${postId}/comments`).then(setPostComments);
@@ -29,6 +42,15 @@ export default function PostCommentSection({ postId }: { postId: number }) {
           {postComments.map((comment) => (
             <li key={comment.id} className="py-2">
               {comment.id} : {comment.content}
+              <button
+                className="ml-2 p-2 rounded border cursor-pointer"
+                onClick={() =>
+                  confirm(`${comment.id}번 댓글을 정말로 삭제하시겠습니까?`) &&
+                  deleteComment(comment.id)
+                }
+              >
+                삭제
+              </button>
             </li>
           ))}
         </ul>
