@@ -76,7 +76,7 @@
 
 ### 002-2 홈
 
-- **[링크](LINK:002-2)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/39cb5c42244a0488392dcfe4efa6212bd07cd1a0)**
 - **원인** : 002-1 테스트가 실패한다. 헤더 컴포넌트가 없고 메인 페이지는 템플릿 소개 화면 그대로다.
 - **작업**
   - 추가 : `SiteHeader` — `메인`, `글 목록` 링크
@@ -90,3 +90,15 @@
   - `next/link` 의 `Link` 는 `<a>` 와 달리 페이지 전체를 다시 불러오지 않고 바뀐 부분만 다시 그린다 (7강).
   - `<body>` 를 `flex flex-col min-h-screen`, `<main>` 을 `flex-grow` 로 두어 내용이 짧아도 푸터가 화면 맨 아래에 붙는다.
   - 결과 : 테스트 2개 통과.
+
+### 003-1 글 다건조회 테스트 추가 (실패)
+
+- **[링크](LINK:003-1)**
+- **원인** : `GET /api/v1/posts` 로 글 목록을 불러와 보여줘야 한다. API 호출 함수와 목록 화면을 먼저 테스트로 정한다.
+- **작업**
+  - 추가 : 테스트 도우미 `mockFetch(routes)` — 전역 `fetch` 를 가짜로 바꿔 주소·메서드별로 정해 둔 JSON 을 돌려준다
+  - 추가 : 테스트 `apiFetch.test.ts` — 주소 앞에 `NEXT_PUBLIC_API_BASE_URL` 을 붙이고 JSON 을 돌려주는지, 본문이 있으면 `Content-Type: application/json; charset=utf-8` 을 넣는지, 이미 정한 `Content-Type` 은 그대로 두는지 확인
+  - 추가 : 테스트 `postList.test.tsx` — 처음에는 `로딩중...`, 불러오면 `글 목록` 제목과 글마다 `/posts/{id}` 링크, 글이 없으면 `글이 없습니다.`, `/posts/write` 로 가는 `글쓰기` 링크 확인
+- **설명**
+  - 실제 백엔드 없이 테스트하려고 `fetch` 를 바꾼다. 등록하지 않은 요청이 오면 에러를 던져 예상하지 못한 호출을 바로 알 수 있다.
+  - 실패 확인 : `@/lib/backend/client` 와 `@/app/posts/page` 가 없어 두 테스트 파일 모두 import 에서 실패한다.
