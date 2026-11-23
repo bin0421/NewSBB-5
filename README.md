@@ -93,7 +93,7 @@
 
 ### 003-1 글 다건조회 테스트 추가 (실패)
 
-- **[링크](LINK:003-1)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/214ae140e0fc400adec49666794ed4915b8f6394)**
 - **원인** : `GET /api/v1/posts` 로 글 목록을 불러와 보여줘야 한다. API 호출 함수와 목록 화면을 먼저 테스트로 정한다.
 - **작업**
   - 추가 : 테스트 도우미 `mockFetch(routes)` — 전역 `fetch` 를 가짜로 바꿔 주소·메서드별로 정해 둔 JSON 을 돌려준다
@@ -102,3 +102,17 @@
 - **설명**
   - 실제 백엔드 없이 테스트하려고 `fetch` 를 바꾼다. 등록하지 않은 요청이 오면 에러를 던져 예상하지 못한 호출을 바로 알 수 있다.
   - 실패 확인 : `@/lib/backend/client` 와 `@/app/posts/page` 가 없어 두 테스트 파일 모두 import 에서 실패한다.
+
+### 003-2 글 다건조회
+
+- **[링크](LINK:003-2)**
+- **원인** : 003-1 테스트가 실패한다. API 호출 함수, 응답 타입, 글 목록 페이지가 없다.
+- **작업**
+  - 추가 : `apiFetch(url, options)` (`src/lib/backend/client.ts`)
+  - 추가 : 타입 `PostDto`, `PostWithContentDto`, `PostCommentDto` (`src/type/post.ts`)
+  - 추가 : 글 목록 페이지 `/posts` (`src/app/posts/page.tsx`)
+- **설명**
+  - `apiFetch` 는 강의 21·24·27강의 방식이다. 주소 앞부분과 `res.json()` 반복을 없애고, 본문이 있을 때만 `Headers` 객체로 `Content-Type` 을 넣는다. `Headers` 는 헤더 이름의 대소문자를 가리지 않으므로 이미 넣은 값을 정확히 찾는다.
+  - 타입 필드는 백엔드 `PostDto`·`PostCommentDto` 와 같다. 목록에는 내용이 필요 없으므로 `PostDto` 에는 `content` 를 두지 않고, 상세용 `PostWithContentDto` 는 `&` 로 `content` 를 더한다 (19강).
+  - 페이지는 `"use client"` 클라이언트 컴포넌트다. `useEffect` 에서 불러와 `useState` 에 넣는다. 상태 초기값을 빈 배열이 아닌 `null` 로 두어 로딩중과 글 없음을 구분한다 (31강).
+  - 결과 : 테스트 9개 통과.
