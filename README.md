@@ -342,7 +342,7 @@
 
 ### 012-2 API 오류 처리
 
-- **[링크](LINK:012-2)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/7b83d651bf2f1071b778a6b6b1e2cb8fb827a37d)**
 - **원인** : 012-1 테스트가 실패한다. `apiFetch` 가 실패 응답을 구별하지 않고, 호출하는 곳에 실패 처리가 없다.
 - **작업**
   - 추가 : `ApiError` — `Error` 상속, `status`, `resultCode`, `msg`, `message` 는 `resultCode : msg`
@@ -356,4 +356,24 @@
   - 실패 응답 본문이 JSON 이 아니면(예: 프록시의 HTML 오류 페이지) `resultCode` 는 상태 코드, `msg` 는 `statusText` 로 채운다.
   - `ApiError` 의 `message` 를 `resultCode : msg` 로 만들어 두어, `alertError` 는 `Error` 면 `message` 만 보여주면 된다. 네트워크 오류(`TypeError: Failed to fetch`)도 같은 함수로 알린다.
   - 바뀐 파일은 Prettier 로 정리했다.
+  - 결과 : 테스트 42개 통과.
+
+### 013 글 정보 usePost 훅·PostInfo 분리
+
+- **[링크](LINK:013)**
+- **원인** : 37·38강. 글 상세 페이지 한 컴포넌트가 데이터 불러오기, 삭제 API, 확인창, 이동, 화면 그리기를 모두 한다. 글 수정 페이지도 같은 글 불러오기 코드를 따로 갖고 있다.
+- **작업**
+  - 추가 : 훅 `usePost(id)` (`src/hooks/usePost.ts`) — `post` 상태, `deletePost()`, `modifyPost(values)`
+  - 추가 : `PostInfo({ post, onDelete })` — 번호·제목·내용, 삭제 확인창, 수정 링크
+  - 수정 : 글 상세 페이지
+    - 이전 : 글 상태·불러오기·삭제 API·화면을 모두 가짐
+    - 이후 : `usePost(id)` 로 데이터를 받고, 삭제 성공 시 알림·이동만 하는 `handleDelete` 를 `PostInfo` 에 넘긴다
+  - 수정 : 글 수정 페이지
+    - 이전 : 글 상태와 불러오기, `PUT` 호출을 직접 가짐
+    - 이후 : `usePost(id)` 의 `post`, `modifyPost`
+- **설명**
+  - 훅은 데이터와 API 호출만 맡는다. 강의는 `deletePost(id, onSuccess)` 처럼 성공 콜백을 받지만, 여기서는 응답 Promise 를 돌려주고 성공·실패 처리는 화면이 `.then`·`.catch` 로 정한다. 같은 훅을 상세(삭제 후 목록으로)와 수정(저장 후 상세로)이 서로 다르게 쓸 수 있다.
+  - `deletePost`·`modifyPost` 는 훅이 받은 `id` 를 기억하므로(클로저) 인자로 다시 받지 않는다 (46강).
+  - `PostInfo` 는 필요한 값(`post`)과 함수(`onDelete`)만 props 로 받는다. 확인창은 화면 동작이라 `PostInfo` 에 두었다 (43강의 "JSX 밖으로 스크립트 옮기기"도 `handleDeleteClick` 으로 반영).
+  - 테스트는 바꾸지 않았다. 화면 기준 테스트라 내부 구조가 바뀌어도 그대로 통과한다.
   - 결과 : 테스트 42개 통과.

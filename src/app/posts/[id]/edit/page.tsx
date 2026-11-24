@@ -1,10 +1,9 @@
 "use client";
 
 import PostForm, { type PostFormValues } from "@/components/PostForm";
-import { alertError, apiFetch } from "@/lib/backend/client";
-import type { PostWithContentDto, RsData } from "@/type/post";
+import { usePost } from "@/hooks/usePost";
+import { alertError } from "@/lib/backend/client";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function Page() {
   const router = useRouter();
@@ -12,18 +11,11 @@ export default function Page() {
   const { id: idStr } = useParams<{ id: string }>();
   const id = Number(idStr);
 
-  const [post, setPost] = useState<PostWithContentDto | null>(null);
+  const { post, modifyPost } = usePost(id);
 
-  useEffect(() => {
-    apiFetch(`/api/v1/posts/${id}`).then(setPost).catch(alertError);
-  }, [id]);
-
-  const modifyPost = (values: PostFormValues) => {
-    apiFetch(`/api/v1/posts/${id}`, {
-      method: "PUT",
-      body: JSON.stringify(values),
-    })
-      .then((data: RsData<null>) => {
+  const handleSubmit = (values: PostFormValues) => {
+    modifyPost(values)
+      .then((data) => {
         alert(data.msg);
 
         router.replace(`/posts/${id}`);
@@ -37,7 +29,7 @@ export default function Page() {
     <>
       <h1>{id}번 글 수정</h1>
 
-      <PostForm defaultValues={post} onSubmit={modifyPost} />
+      <PostForm defaultValues={post} onSubmit={handleSubmit} />
     </>
   );
 }
