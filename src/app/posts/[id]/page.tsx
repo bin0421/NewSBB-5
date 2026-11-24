@@ -1,7 +1,7 @@
 "use client";
 
 import PostCommentSection from "@/components/PostCommentSection";
-import { apiFetch } from "@/lib/backend/client";
+import { alertError, apiFetch } from "@/lib/backend/client";
 import type { PostWithContentDto } from "@/type/post";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -18,15 +18,17 @@ export default function Page() {
   const deletePost = (id: number) => {
     apiFetch(`/api/v1/posts/${id}`, {
       method: "DELETE",
-    }).then((data) => {
-      alert(data.msg);
+    })
+      .then((data) => {
+        alert(data.msg);
 
-      router.replace("/posts");
-    });
+        router.replace("/posts");
+      })
+      .catch(alertError);
   };
 
   useEffect(() => {
-    apiFetch(`/api/v1/posts/${id}`).then(setPost);
+    apiFetch(`/api/v1/posts/${id}`).then(setPost).catch(alertError);
   }, [id]);
 
   if (post == null) return <div>로딩중...</div>;

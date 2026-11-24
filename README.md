@@ -329,7 +329,7 @@
 
 ### 012-1 API 오류 처리 테스트 추가 (실패)
 
-- **[링크](LINK:012-1)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/ee56b7b8e6f4d869b59c0c123d3cdde1e1cef75c)**
 - **원인** : 36강. `fetch` 는 응답 코드가 4xx·5xx 여도 reject 하지 않는다. 지금은 실패 응답도 성공처럼 처리해서, 예를 들어 글쓰기가 400 을 받으면 `data.data` 가 `null` 이라 오류가 나거나 엉뚱한 곳으로 이동한다. 실패를 알리고 아무것도 바꾸지 않아야 한다.
 - **작업**
   - 추가 : 테스트 `apiError.test.tsx`
@@ -339,3 +339,21 @@
 - **설명**
   - 강의는 실패 응답 본문(객체)을 그대로 `throw` 한다. 여기서는 `Error` 를 상속한 `ApiError` 로 감싸기로 하고 `toBeInstanceOf(ApiError)` 로 확인한다. `Error` 를 상속하면 스택 정보가 남고, 네트워크 오류 같은 다른 예외와 `instanceof` 로 구별할 수 있다.
   - 실패 확인 : `ApiError` 가 없어 `The instanceof assertion needs a constructor but undefined was given.`, 화면 테스트 7개는 오류 알림이 없어 `expected "bound " to be called with arguments` 로 모두 8개가 실패한다.
+
+### 012-2 API 오류 처리
+
+- **[링크](LINK:012-2)**
+- **원인** : 012-1 테스트가 실패한다. `apiFetch` 가 실패 응답을 구별하지 않고, 호출하는 곳에 실패 처리가 없다.
+- **작업**
+  - 추가 : `ApiError` — `Error` 상속, `status`, `resultCode`, `msg`, `message` 는 `resultCode : msg`
+  - 추가 : `alertError(error)` — 실패를 알림창으로 보여준다
+  - 수정 : `apiFetch`
+    - 이전 : 응답 코드와 상관없이 `res.json()` 을 돌려준다
+    - 이후 : `res.ok` 가 아니면 본문의 `resultCode`, `msg` 로 `ApiError` 를 던진다
+  - 수정 : 글 목록, 글 상세(불러오기·삭제), 글쓰기, 글 수정(불러오기·저장), 댓글(불러오기·삭제·작성)의 `apiFetch` 호출 끝에 `.catch(alertError)`
+- **설명**
+  - `then` 안에서 예외를 던지면 그 뒤의 `then` 은 모두 건너뛰고 `catch` 로 간다 (36강). 그래서 성공 처리(메세지, 이동, 상태 변경)는 고치지 않아도 실패하면 실행되지 않는다.
+  - 실패 응답 본문이 JSON 이 아니면(예: 프록시의 HTML 오류 페이지) `resultCode` 는 상태 코드, `msg` 는 `statusText` 로 채운다.
+  - `ApiError` 의 `message` 를 `resultCode : msg` 로 만들어 두어, `alertError` 는 `Error` 면 `message` 만 보여주면 된다. 네트워크 오류(`TypeError: Failed to fetch`)도 같은 함수로 알린다.
+  - 바뀐 파일은 Prettier 로 정리했다.
+  - 결과 : 테스트 42개 통과.

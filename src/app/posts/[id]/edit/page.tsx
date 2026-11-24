@@ -1,7 +1,7 @@
 "use client";
 
 import PostForm, { type PostFormValues } from "@/components/PostForm";
-import { apiFetch } from "@/lib/backend/client";
+import { alertError, apiFetch } from "@/lib/backend/client";
 import type { PostWithContentDto, RsData } from "@/type/post";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -15,18 +15,20 @@ export default function Page() {
   const [post, setPost] = useState<PostWithContentDto | null>(null);
 
   useEffect(() => {
-    apiFetch(`/api/v1/posts/${id}`).then(setPost);
+    apiFetch(`/api/v1/posts/${id}`).then(setPost).catch(alertError);
   }, [id]);
 
   const modifyPost = (values: PostFormValues) => {
     apiFetch(`/api/v1/posts/${id}`, {
       method: "PUT",
       body: JSON.stringify(values),
-    }).then((data: RsData<null>) => {
-      alert(data.msg);
+    })
+      .then((data: RsData<null>) => {
+        alert(data.msg);
 
-      router.replace(`/posts/${id}`);
-    });
+        router.replace(`/posts/${id}`);
+      })
+      .catch(alertError);
   };
 
   if (post == null) return <div>로딩중...</div>;

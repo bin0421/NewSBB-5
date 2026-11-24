@@ -1,6 +1,6 @@
 "use client";
 
-import { apiFetch } from "@/lib/backend/client";
+import { alertError, apiFetch } from "@/lib/backend/client";
 import { COMMENT_CONTENT, validateField } from "@/lib/validation";
 import type { PostCommentDto, RsData } from "@/type/post";
 import { useEffect, useState } from "react";
@@ -14,14 +14,16 @@ export default function PostCommentSection({ postId }: { postId: number }) {
   const deleteComment = (commentId: number) => {
     apiFetch(`/api/v1/posts/${postId}/comments/${commentId}`, {
       method: "DELETE",
-    }).then((data: RsData<null>) => {
-      alert(data.msg);
+    })
+      .then((data: RsData<null>) => {
+        alert(data.msg);
 
-      // 요청이 성공하면 상태에서도 제거하여 UI 에 바로 반영
-      setPostComments(
-        (prev) => prev?.filter((c) => c.id != commentId) ?? prev,
-      );
-    });
+        // 요청이 성공하면 상태에서도 제거하여 UI 에 바로 반영
+        setPostComments(
+          (prev) => prev?.filter((c) => c.id != commentId) ?? prev,
+        );
+      })
+      .catch(alertError);
   };
 
   const handleCommentWriteFormSubmit = (
@@ -42,18 +44,22 @@ export default function PostCommentSection({ postId }: { postId: number }) {
       body: JSON.stringify({
         content: contentTextarea.value,
       }),
-    }).then((data: RsData<PostCommentDto>) => {
-      alert(data.msg);
+    })
+      .then((data: RsData<PostCommentDto>) => {
+        alert(data.msg);
 
-      contentTextarea.value = "";
+        contentTextarea.value = "";
 
-      // 요청이 성공하면 상태에도 추가하여 UI 에 바로 반영
-      setPostComments((prev) => (prev == null ? prev : [...prev, data.data]));
-    });
+        // 요청이 성공하면 상태에도 추가하여 UI 에 바로 반영
+        setPostComments((prev) => (prev == null ? prev : [...prev, data.data]));
+      })
+      .catch(alertError);
   };
 
   useEffect(() => {
-    apiFetch(`/api/v1/posts/${postId}/comments`).then(setPostComments);
+    apiFetch(`/api/v1/posts/${postId}/comments`)
+      .then(setPostComments)
+      .catch(alertError);
   }, [postId]);
 
   return (
