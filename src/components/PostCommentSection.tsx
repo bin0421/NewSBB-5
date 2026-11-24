@@ -1,6 +1,7 @@
 "use client";
 
 import { apiFetch } from "@/lib/backend/client";
+import { COMMENT_CONTENT, validateField } from "@/lib/validation";
 import type { PostCommentDto, RsData } from "@/type/post";
 import { useEffect, useState } from "react";
 
@@ -34,14 +35,7 @@ export default function PostCommentSection({ postId }: { postId: number }) {
       "content",
     ) as HTMLTextAreaElement;
 
-    contentTextarea.value = contentTextarea.value.trim();
-
-    if (contentTextarea.value.length === 0) {
-      alert("댓글 내용을 입력해주세요.");
-      contentTextarea.focus();
-
-      return;
-    }
+    if (!validateField(contentTextarea, COMMENT_CONTENT)) return;
 
     apiFetch(`/api/v1/posts/${postId}/comments`, {
       method: "POST",
@@ -71,6 +65,8 @@ export default function PostCommentSection({ postId }: { postId: number }) {
           className="border p-2 rounded"
           name="content"
           placeholder="댓글 내용"
+          maxLength={COMMENT_CONTENT.max}
+          rows={5}
         />
         <button className="p-2 rounded border cursor-pointer" type="submit">
           작성

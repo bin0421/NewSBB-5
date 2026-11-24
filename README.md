@@ -293,7 +293,7 @@
 
 ### 011-1 유효성 검사 세분화 테스트 추가 (실패)
 
-- **[링크](LINK:011-1)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/1b840df5fc066d6f107d4e307caf10c7301d2299)**
 - **원인** : 35강. 지금 폼은 빈 값만 막는다. 백엔드는 제목·내용·댓글을 2자 이상으로 제한하므로(`@Size(min = 2)`) 1자를 보내면 400 응답을 받는다. 서버에 보내기 전에 같은 규칙으로 막아야 한다.
 - **작업**
   - 추가 : 테스트 `validation.test.tsx`
@@ -305,3 +305,24 @@
   - 강의는 글쓰기·댓글 폼마다 `if` 문을 하나씩 더 붙인다. 여기서는 규칙과 안내 문구를 한 모듈(`@/lib/validation`)에 두고 모든 폼이 같이 쓰도록 테스트를 짰다.
   - 최대 길이는 `maxLength` 속성으로 입력 자체를 막는다. 그래서 테스트는 속성이 걸려 있는지만 확인한다.
   - 실패 확인 : `@/lib/validation` 이 없어 import 에서 실패한다.
+
+### 011-2 유효성 검사 세분화
+
+- **[링크](LINK:011-2)**
+- **원인** : 011-1 테스트가 실패한다. 길이 규칙 모듈이 없고, 폼은 빈 값만 검사한다.
+- **작업**
+  - 추가 : `src/lib/validation.ts`
+    - 규칙 `POST_TITLE`, `POST_CONTENT`, `COMMENT_CONTENT` — `label`, `min`, `max`
+    - `checkLength(value, rule)` — 안내 문구 또는 `null`
+    - `validateField(field, rule)` — 앞뒤 공백 제거, 검사, 실패하면 경고·포커스 후 `false`
+  - 수정 : `PostForm`
+    - 이전 : 제목·내용마다 `trim()` 과 빈 값 검사 `if` 문
+    - 이후 : `validateField(titleInput, POST_TITLE)`, `validateField(contentTextarea, POST_CONTENT)`, 입력 칸에 `maxLength`, 내용 칸 `rows={10}`
+  - 수정 : `PostCommentSection` 댓글 작성 폼
+    - 이전 : `trim()` 과 빈 값 검사 `if` 문
+    - 이후 : `validateField(contentTextarea, COMMENT_CONTENT)`, `maxLength`, `rows={5}`
+- **설명**
+  - 안내 문구는 규칙의 `label` 로 만든다. 빈 값 문구(`제목을 입력해주세요.` 등)가 이전과 같으므로 기존 테스트도 그대로 통과한다.
+  - `checkLength` 는 DOM 을 모르는 순수 함수라 따로 테스트할 수 있고, `validateField` 는 폼에서 되풀이하던 공백 제거·경고·포커스를 맡는다.
+  - 글 수정 페이지는 `PostForm` 을 쓰므로 고치지 않아도 같은 규칙이 적용된다. (강의는 글쓰기와 댓글 폼만 고친다.)
+  - 결과 : 테스트 34개 통과.

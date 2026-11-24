@@ -1,5 +1,7 @@
 "use client";
 
+import { POST_CONTENT, POST_TITLE, validateField } from "@/lib/validation";
+
 export type PostFormValues = {
   title: string;
   content: string;
@@ -10,7 +12,7 @@ type PostFormProps = {
   onSubmit: (values: PostFormValues) => void;
 };
 
-/** 글 작성/수정에서 공통으로 쓰는 폼. 앞뒤 공백 제거 후 빈 값이면 경고한다. */
+/** 글 작성/수정에서 공통으로 쓰는 폼. 앞뒤 공백을 지우고 길이 규칙에 맞지 않으면 경고한다. */
 export default function PostForm({ defaultValues, onSubmit }: PostFormProps) {
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,23 +24,8 @@ export default function PostForm({ defaultValues, onSubmit }: PostFormProps) {
       "content",
     ) as HTMLTextAreaElement;
 
-    titleInput.value = titleInput.value.trim();
-
-    if (titleInput.value.length === 0) {
-      alert("제목을 입력해주세요.");
-      titleInput.focus();
-
-      return;
-    }
-
-    contentTextarea.value = contentTextarea.value.trim();
-
-    if (contentTextarea.value.length === 0) {
-      alert("내용을 입력해주세요.");
-      contentTextarea.focus();
-
-      return;
-    }
+    if (!validateField(titleInput, POST_TITLE)) return;
+    if (!validateField(contentTextarea, POST_CONTENT)) return;
 
     onSubmit({ title: titleInput.value, content: contentTextarea.value });
   };
@@ -50,6 +37,7 @@ export default function PostForm({ defaultValues, onSubmit }: PostFormProps) {
         type="text"
         name="title"
         placeholder="제목"
+        maxLength={POST_TITLE.max}
         autoFocus
         defaultValue={defaultValues?.title}
       />
@@ -57,6 +45,8 @@ export default function PostForm({ defaultValues, onSubmit }: PostFormProps) {
         className="border p-2 rounded"
         name="content"
         placeholder="내용"
+        maxLength={POST_CONTENT.max}
+        rows={10}
         defaultValue={defaultValues?.content}
       />
       <button className="border p-2 rounded" type="submit">
