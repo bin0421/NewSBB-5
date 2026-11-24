@@ -413,7 +413,7 @@
 
 ### 016-1 댓글 수정 테스트 추가 (실패)
 
-- **[링크](LINK:016-1)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/72b5602c6871b892f2c37a3ba218fbb69d25a6ee)**
 - **원인** : 49·50강. 백엔드에 댓글 수정 API(`PUT /api/v1/posts/{postId}/comments/{id}`)가 있는데 화면에서 댓글을 고칠 방법이 없다.
 - **작업**
   - 추가 : 테스트 `commentModify.test.tsx`
@@ -424,3 +424,20 @@
 - **설명**
   - 댓글 목록의 다른 항목과 작성 폼에도 입력 칸이 있으므로 `within(item)` 으로 한 댓글 안에서만 찾는다.
   - 실패 확인 : 수정 버튼이 없어 `Unable to find an accessible element with the role "button" and name "수정"` 으로 4개 테스트가 실패한다.
+
+### 016-2 댓글 수정
+
+- **[링크](LINK:016-2)**
+- **원인** : 016-1 테스트가 실패한다. 댓글 수정 API 호출과 수정 화면이 없다.
+- **작업**
+  - 추가 : `usePostComments` 의 `modifyComment(commentId, content)` — `PUT` 성공 시 목록에서 그 댓글의 `content` 만 바꾼다
+  - 수정 : `PostCommentListItem`
+    - 이전 : 내용과 삭제 버튼
+    - 이후 : `modifyMode` 상태, `수정`·`수정취소` 토글 버튼, 수정 모드면 내용 자리에 수정 폼(기존 내용, `autoFocus`), 저장 성공 시 알림 후 수정 모드 끄기
+  - 수정 : `PostCommentList`, `PostCommentSection` — `modifyComment` 를 항목까지 전달
+- **설명**
+  - 수정 모드는 댓글마다 따로 켜고 끄므로 목록이 아니라 항목 컴포넌트의 상태다. 015 에서 항목을 컴포넌트로 떼어 둔 덕분에 다른 파일은 함수 전달만 더하면 된다.
+  - 수정 API 응답에는 댓글이 없다(`RsData<Void>`). 그래서 다시 불러오지 않고 보낸 내용으로 상태를 바꾼다 (50강). 실패하면 `then` 을 건너뛰므로 상태도 수정 모드도 그대로다.
+  - 수정 폼은 `modifyMode` 가 켜질 때 새로 그려지므로 `defaultValue` 가 늘 최신 내용이고, 수정취소 후 다시 열어도 저장 전 입력은 남지 않는다.
+  - 수정 폼은 작성 폼과 검사·입력 칸이 같다. 다음 단계에서 합친다.
+  - 결과 : 테스트 46개 통과.

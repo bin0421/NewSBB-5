@@ -6,7 +6,8 @@ import { usePostComments } from "@/hooks/usePostComments";
 
 /** 글 상세의 댓글 영역. 데이터는 훅에서 받아 하위 컴포넌트에 필요한 것만 넘긴다. */
 export default function PostCommentSection({ postId }: { postId: number }) {
-  const { postComments, writeComment, deleteComment } = usePostComments(postId);
+  const { postComments, writeComment, deleteComment, modifyComment } =
+    usePostComments(postId);
 
   return (
     <>
@@ -17,6 +18,7 @@ export default function PostCommentSection({ postId }: { postId: number }) {
       <PostCommentList
         postComments={postComments}
         deleteComment={deleteComment}
+        modifyComment={modifyComment}
       />
     </>
   );

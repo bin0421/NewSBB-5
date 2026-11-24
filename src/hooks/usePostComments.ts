@@ -40,5 +40,20 @@ export function usePostComments(postId: number) {
       return data;
     });
 
-  return { postComments, writeComment, deleteComment };
+  const modifyComment = (commentId: number, content: string) =>
+    apiFetch(`/api/v1/posts/${postId}/comments/${commentId}`, {
+      method: "PUT",
+      body: JSON.stringify({ content }),
+    }).then((data: RsData<null>) => {
+      // 응답에 댓글이 없으므로 보낸 내용으로 목록의 그 댓글만 바꾼다.
+      setPostComments(
+        (prev) =>
+          prev?.map((c) => (c.id === commentId ? { ...c, content } : c)) ??
+          prev,
+      );
+
+      return data;
+    });
+
+  return { postComments, writeComment, deleteComment, modifyComment };
 }

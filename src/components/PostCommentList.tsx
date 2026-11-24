@@ -4,12 +4,17 @@ import type { PostCommentDto, RsData } from "@/type/post";
 type PostCommentListProps = {
   postComments: PostCommentDto[] | null;
   deleteComment: (commentId: number) => Promise<RsData<unknown>>;
+  modifyComment: (
+    commentId: number,
+    content: string,
+  ) => Promise<RsData<unknown>>;
 };
 
 /** 댓글 목록. null 이면 아직 불러오는 중이다. */
 export default function PostCommentList({
   postComments,
   deleteComment,
+  modifyComment,
 }: PostCommentListProps) {
   return (
     <>
@@ -28,6 +33,7 @@ export default function PostCommentList({
               key={comment.id}
               comment={comment}
               deleteComment={deleteComment}
+              modifyComment={modifyComment}
             />
           ))}
         </ul>
