@@ -444,7 +444,7 @@
 
 ### 016-3 댓글 작성·수정 폼 공통 컴포넌트로 분리
 
-- **[링크](LINK:016-3)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/660793958d3203b1d3b34a7810e53514c603173d)**
 - **원인** : 댓글 작성 폼(`PostCommentWrite`)과 수정 폼(`PostCommentListItem`)에 입력 칸 속성, 공백 제거·길이 검사, 실패 알림이 두 벌 있다.
 - **작업**
   - 추가 : `PostCommentForm({ submitLabel, onSubmit, defaultValue, autoFocus, clearOnSuccess, className })`
@@ -460,3 +460,15 @@
   - 강의는 작성 폼과 수정 폼을 각각 따로 만든다. 글 폼(`PostForm`, 007-3)과 같은 방식으로 합쳤다.
   - 테스트는 바꾸지 않았다. 댓글 작성(010)·수정(016)·유효성(011)·오류(012) 테스트가 그대로 통과한다.
   - 결과 : 테스트 46개 통과.
+
+### 017-1 댓글 여러 줄 표시 테스트 추가 (실패)
+
+- **[링크](LINK:017-1)**
+- **원인** : 51강. 댓글은 여러 줄로 쓸 수 있는데(`textarea`), HTML 은 줄바꿈 문자를 공백으로 보여주므로 목록에서는 한 줄로 합쳐 보인다. 글 내용(004-2)처럼 줄바꿈을 살려야 한다.
+- **작업**
+  - 추가 : 테스트 `commentMultiline.test.tsx`
+    - 불러온 댓글 `첫째 줄\n둘째 줄` 이 줄바꿈 문자를 담은 채 `white-space: pre-line` 으로 보이는지
+    - 수정 폼에서 `Enter` 로 줄을 바꿔 저장한 내용도 같은지
+- **설명**
+  - 줄바꿈이 실제로 화면에서 나뉘는지는 jsdom 이 그리지 않으므로 알 수 없다. 대신 줄바꿈 문자가 그대로 있고 `pre-line` 이 걸려 있는지를 확인한다.
+  - 실패 확인 : 내용은 있지만 스타일이 없어 `expect(element).toHaveStyle()` 의 `whiteSpace: pre-line` 으로 2개 테스트가 실패한다.
