@@ -308,7 +308,7 @@
 
 ### 011-2 유효성 검사 세분화
 
-- **[링크](LINK:011-2)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/153dee29b274b90c6fcd34fe3bdacc6532134c15)**
 - **원인** : 011-1 테스트가 실패한다. 길이 규칙 모듈이 없고, 폼은 빈 값만 검사한다.
 - **작업**
   - 추가 : `src/lib/validation.ts`
@@ -326,3 +326,16 @@
   - `checkLength` 는 DOM 을 모르는 순수 함수라 따로 테스트할 수 있고, `validateField` 는 폼에서 되풀이하던 공백 제거·경고·포커스를 맡는다.
   - 글 수정 페이지는 `PostForm` 을 쓰므로 고치지 않아도 같은 규칙이 적용된다. (강의는 글쓰기와 댓글 폼만 고친다.)
   - 결과 : 테스트 34개 통과.
+
+### 012-1 API 오류 처리 테스트 추가 (실패)
+
+- **[링크](LINK:012-1)**
+- **원인** : 36강. `fetch` 는 응답 코드가 4xx·5xx 여도 reject 하지 않는다. 지금은 실패 응답도 성공처럼 처리해서, 예를 들어 글쓰기가 400 을 받으면 `data.data` 가 `null` 이라 오류가 나거나 엉뚱한 곳으로 이동한다. 실패를 알리고 아무것도 바꾸지 않아야 한다.
+- **작업**
+  - 추가 : 테스트 `apiError.test.tsx`
+    - `apiFetch` 가 4xx·5xx 응답이면 `ApiError` 로 reject 하고 `status`, `resultCode`, `msg` 를 담는지
+    - 글 목록·글 상세 불러오기, 글쓰기, 글 수정, 글 삭제, 댓글 작성, 댓글 삭제가 실패하면 `resultCode : msg` 형식으로 알리는지
+    - 실패하면 이동(`router.replace`)하지 않고, 댓글 작성은 입력한 내용과 목록을, 댓글 삭제는 그 댓글을 그대로 두는지
+- **설명**
+  - 강의는 실패 응답 본문(객체)을 그대로 `throw` 한다. 여기서는 `Error` 를 상속한 `ApiError` 로 감싸기로 하고 `toBeInstanceOf(ApiError)` 로 확인한다. `Error` 를 상속하면 스택 정보가 남고, 네트워크 오류 같은 다른 예외와 `instanceof` 로 구별할 수 있다.
+  - 실패 확인 : `ApiError` 가 없어 `The instanceof assertion needs a constructor but undefined was given.`, 화면 테스트 7개는 오류 알림이 없어 `expected "bound " to be called with arguments` 로 모두 8개가 실패한다.
