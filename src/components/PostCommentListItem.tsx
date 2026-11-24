@@ -1,7 +1,7 @@
 "use client";
 
+import PostCommentForm from "@/components/PostCommentForm";
 import { alertError } from "@/lib/backend/client";
-import { COMMENT_CONTENT, validateField } from "@/lib/validation";
 import type { PostCommentDto, RsData } from "@/type/post";
 import { useState } from "react";
 
@@ -30,44 +30,24 @@ export default function PostCommentListItem({
       .catch(alertError);
   };
 
-  const handleModifySubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleModifySubmit = (content: string) =>
+    modifyComment(comment.id, content).then((data) => {
+      alert(data.msg);
 
-    const form = e.currentTarget;
-
-    const contentTextarea = form.elements.namedItem(
-      "content",
-    ) as HTMLTextAreaElement;
-
-    if (!validateField(contentTextarea, COMMENT_CONTENT)) return;
-
-    modifyComment(comment.id, contentTextarea.value)
-      .then((data) => {
-        alert(data.msg);
-
-        setModifyMode(false);
-      })
-      .catch(alertError);
-  };
+      setModifyMode(false);
+    });
 
   return (
     <li className="py-2">
       {comment.id} : {!modifyMode && comment.content}
       {modifyMode && (
-        <form className="inline-flex gap-2" onSubmit={handleModifySubmit}>
-          <textarea
-            className="border p-2 rounded"
-            name="content"
-            placeholder="댓글 내용"
-            maxLength={COMMENT_CONTENT.max}
-            rows={5}
-            defaultValue={comment.content}
-            autoFocus
-          />
-          <button className="p-2 rounded border cursor-pointer" type="submit">
-            저장
-          </button>
-        </form>
+        <PostCommentForm
+          className="inline-flex gap-2"
+          submitLabel="저장"
+          onSubmit={handleModifySubmit}
+          defaultValue={comment.content}
+          autoFocus
+        />
       )}
       <button
         className="ml-2 p-2 rounded border cursor-pointer"

@@ -427,7 +427,7 @@
 
 ### 016-2 댓글 수정
 
-- **[링크](LINK:016-2)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/fee748ee12f8e1ebfad7f1486dddc80e468462f5)**
 - **원인** : 016-1 테스트가 실패한다. 댓글 수정 API 호출과 수정 화면이 없다.
 - **작업**
   - 추가 : `usePostComments` 의 `modifyComment(commentId, content)` — `PUT` 성공 시 목록에서 그 댓글의 `content` 만 바꾼다
@@ -440,4 +440,23 @@
   - 수정 API 응답에는 댓글이 없다(`RsData<Void>`). 그래서 다시 불러오지 않고 보낸 내용으로 상태를 바꾼다 (50강). 실패하면 `then` 을 건너뛰므로 상태도 수정 모드도 그대로다.
   - 수정 폼은 `modifyMode` 가 켜질 때 새로 그려지므로 `defaultValue` 가 늘 최신 내용이고, 수정취소 후 다시 열어도 저장 전 입력은 남지 않는다.
   - 수정 폼은 작성 폼과 검사·입력 칸이 같다. 다음 단계에서 합친다.
+  - 결과 : 테스트 46개 통과.
+
+### 016-3 댓글 작성·수정 폼 공통 컴포넌트로 분리
+
+- **[링크](LINK:016-3)**
+- **원인** : 댓글 작성 폼(`PostCommentWrite`)과 수정 폼(`PostCommentListItem`)에 입력 칸 속성, 공백 제거·길이 검사, 실패 알림이 두 벌 있다.
+- **작업**
+  - 추가 : `PostCommentForm({ submitLabel, onSubmit, defaultValue, autoFocus, clearOnSuccess, className })`
+  - 수정 : `PostCommentWrite`
+    - 이전 : 폼·검사·실패 알림·입력 칸 비우기를 직접 가짐
+    - 이후 : `<PostCommentForm submitLabel="작성" clearOnSuccess onSubmit={...} />`, 성공 알림만 한다
+  - 수정 : `PostCommentListItem`
+    - 이전 : 수정 폼·검사·실패 알림을 직접 가짐
+    - 이후 : `<PostCommentForm submitLabel="저장" defaultValue={comment.content} autoFocus onSubmit={...} />`, 성공 알림과 수정 모드 끄기만 한다
+- **설명**
+  - `onSubmit` 은 Promise 를 돌려준다. 호출하는 쪽은 성공했을 때 할 일만 `.then` 으로 붙이고, 실패는 폼이 `.catch(alertError)` 로 한 곳에서 알린다. 실패하면 `then` 을 건너뛰므로 입력 칸을 비우지 않는다.
+  - 입력 칸 비우기는 작성 폼에만 필요하므로 `clearOnSuccess` 로 고른다. 수정 폼은 성공하면 수정 모드가 꺼지면서 폼 자체가 사라진다.
+  - 강의는 작성 폼과 수정 폼을 각각 따로 만든다. 글 폼(`PostForm`, 007-3)과 같은 방식으로 합쳤다.
+  - 테스트는 바꾸지 않았다. 댓글 작성(010)·수정(016)·유효성(011)·오류(012) 테스트가 그대로 통과한다.
   - 결과 : 테스트 46개 통과.

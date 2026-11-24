@@ -1,7 +1,6 @@
 "use client";
 
-import { alertError } from "@/lib/backend/client";
-import { COMMENT_CONTENT, validateField } from "@/lib/validation";
+import PostCommentForm from "@/components/PostCommentForm";
 import type { RsData } from "@/type/post";
 
 type PostCommentWriteProps = {
@@ -12,42 +11,18 @@ type PostCommentWriteProps = {
 export default function PostCommentWrite({
   writeComment,
 }: PostCommentWriteProps) {
-  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const form = e.currentTarget;
-
-    const contentTextarea = form.elements.namedItem(
-      "content",
-    ) as HTMLTextAreaElement;
-
-    if (!validateField(contentTextarea, COMMENT_CONTENT)) return;
-
-    writeComment(contentTextarea.value)
-      .then((data) => {
-        alert(data.msg);
-
-        contentTextarea.value = "";
-      })
-      .catch(alertError);
-  };
+  const handleSubmit = (content: string) =>
+    writeComment(content).then((data) => alert(data.msg));
 
   return (
     <>
       <h2>댓글 작성</h2>
 
-      <form className="flex gap-2" onSubmit={handleSubmit}>
-        <textarea
-          className="border p-2 rounded"
-          name="content"
-          placeholder="댓글 내용"
-          maxLength={COMMENT_CONTENT.max}
-          rows={5}
-        />
-        <button className="p-2 rounded border cursor-pointer" type="submit">
-          작성
-        </button>
-      </form>
+      <PostCommentForm
+        submitLabel="작성"
+        onSubmit={handleSubmit}
+        clearOnSuccess
+      />
     </>
   );
 }
