@@ -38,11 +38,14 @@ export default function PostCommentListItem({
     });
 
   return (
-    <li className="py-2">
-      {comment.id} : {!modifyMode && comment.content}
+    <li className="py-2 flex gap-2 items-start">
+      {/* 줄바꿈을 살려 여러 줄로 보여준다 */}
+      <span style={{ whiteSpace: "pre-line" }}>
+        {comment.id} : {!modifyMode && comment.content}
+      </span>
       {modifyMode && (
         <PostCommentForm
-          className="inline-flex gap-2"
+          className="flex gap-2 items-start"
           submitLabel="저장"
           onSubmit={handleModifySubmit}
           defaultValue={comment.content}
@@ -50,13 +53,13 @@ export default function PostCommentListItem({
         />
       )}
       <button
-        className="ml-2 p-2 rounded border cursor-pointer"
+        className="p-2 rounded border cursor-pointer"
         onClick={() => setModifyMode((prev) => !prev)}
       >
         {modifyMode ? "수정취소" : "수정"}
       </button>
       <button
-        className="ml-2 p-2 rounded border cursor-pointer"
+        className="p-2 rounded border cursor-pointer"
         onClick={handleDeleteClick}
       >
         삭제
