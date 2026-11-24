@@ -1,28 +1,17 @@
 "use client";
 
-import { alertError, apiFetch } from "@/lib/backend/client";
+import { usePostComments } from "@/hooks/usePostComments";
+import { alertError } from "@/lib/backend/client";
 import { COMMENT_CONTENT, validateField } from "@/lib/validation";
-import type { PostCommentDto, RsData } from "@/type/post";
-import { useEffect, useState } from "react";
 
 export default function PostCommentSection({ postId }: { postId: number }) {
-  // 초기값을 null 로 두어야 "댓글 로딩중"과 "댓글 없음"을 구분할 수 있다.
-  const [postComments, setPostComments] = useState<PostCommentDto[] | null>(
-    null,
-  );
+  const { postComments, writeComment, deleteComment } = usePostComments(postId);
 
-  const deleteComment = (commentId: number) => {
-    apiFetch(`/api/v1/posts/${postId}/comments/${commentId}`, {
-      method: "DELETE",
-    })
-      .then((data: RsData<null>) => {
-        alert(data.msg);
+  const handleDeleteClick = (commentId: number) => {
+    if (!confirm(`${commentId}번 댓글을 정말로 삭제하시겠습니까?`)) return;
 
-        // 요청이 성공하면 상태에서도 제거하여 UI 에 바로 반영
-        setPostComments(
-          (prev) => prev?.filter((c) => c.id != commentId) ?? prev,
-        );
-      })
+    deleteComment(commentId)
+      .then((data) => alert(data.msg))
       .catch(alertError);
   };
 
@@ -39,28 +28,14 @@ export default function PostCommentSection({ postId }: { postId: number }) {
 
     if (!validateField(contentTextarea, COMMENT_CONTENT)) return;
 
-    apiFetch(`/api/v1/posts/${postId}/comments`, {
-      method: "POST",
-      body: JSON.stringify({
-        content: contentTextarea.value,
-      }),
-    })
-      .then((data: RsData<PostCommentDto>) => {
+    writeComment(contentTextarea.value)
+      .then((data) => {
         alert(data.msg);
 
         contentTextarea.value = "";
-
-        // 요청이 성공하면 상태에도 추가하여 UI 에 바로 반영
-        setPostComments((prev) => (prev == null ? prev : [...prev, data.data]));
       })
       .catch(alertError);
   };
-
-  useEffect(() => {
-    apiFetch(`/api/v1/posts/${postId}/comments`)
-      .then(setPostComments)
-      .catch(alertError);
-  }, [postId]);
 
   return (
     <>
@@ -96,10 +71,7 @@ export default function PostCommentSection({ postId }: { postId: number }) {
               {comment.id} : {comment.content}
               <button
                 className="ml-2 p-2 rounded border cursor-pointer"
-                onClick={() =>
-                  confirm(`${comment.id}번 댓글을 정말로 삭제하시겠습니까?`) &&
-                  deleteComment(comment.id)
-                }
+                onClick={() => handleDeleteClick(comment.id)}
               >
                 삭제
               </button>

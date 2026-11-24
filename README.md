@@ -360,7 +360,7 @@
 
 ### 013 글 정보 usePost 훅·PostInfo 분리
 
-- **[링크](LINK:013)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/4ae09153981cd5c38692accd795645be28ea8a6d)**
 - **원인** : 37·38강. 글 상세 페이지 한 컴포넌트가 데이터 불러오기, 삭제 API, 확인창, 이동, 화면 그리기를 모두 한다. 글 수정 페이지도 같은 글 불러오기 코드를 따로 갖고 있다.
 - **작업**
   - 추가 : 훅 `usePost(id)` (`src/hooks/usePost.ts`) — `post` 상태, `deletePost()`, `modifyPost(values)`
@@ -376,4 +376,20 @@
   - `deletePost`·`modifyPost` 는 훅이 받은 `id` 를 기억하므로(클로저) 인자로 다시 받지 않는다 (46강).
   - `PostInfo` 는 필요한 값(`post`)과 함수(`onDelete`)만 props 로 받는다. 확인창은 화면 동작이라 `PostInfo` 에 두었다 (43강의 "JSX 밖으로 스크립트 옮기기"도 `handleDeleteClick` 으로 반영).
   - 테스트는 바꾸지 않았다. 화면 기준 테스트라 내부 구조가 바뀌어도 그대로 통과한다.
+  - 결과 : 테스트 42개 통과.
+
+### 014 댓글 usePostComments 훅 분리
+
+- **[링크](LINK:014)**
+- **원인** : 39강. `PostCommentSection` 한 컴포넌트에 댓글 상태·API 호출·상태 반영과 폼·목록 화면이 섞여 있다. 댓글 수정(016)을 더하기 전에 데이터 로직을 떼어 둔다.
+- **작업**
+  - 추가 : 훅 `usePostComments(postId)` (`src/hooks/usePostComments.ts`) — `postComments` 상태, `writeComment(content)`, `deleteComment(commentId)`
+  - 수정 : `PostCommentSection`
+    - 이전 : 댓글 상태, 불러오기, 작성·삭제 API 호출과 상태 반영을 직접 가짐
+    - 이후 : `usePostComments(postId)` 를 쓰고 확인창·알림·입력 칸 비우기만 한다. 삭제 버튼의 스크립트는 `handleDeleteClick` 으로 JSX 밖에 둔다
+- **설명**
+  - 나누는 기준 : 목록 상태에 반영하는 일은 어느 화면에서 부르든 같으므로 훅이 성공 시 바로 한다. 알림, 입력 칸 비우기처럼 화면마다 다를 수 있는 일은 훅이 돌려준 Promise 의 `.then` 에서 화면이 한다.
+  - 함수들은 `postId` 를 기억하므로(클로저) 인자로 받지 않는다 (46강). 글 번호를 뜻하는 매개변수 이름은 `id` 가 아니라 `postId` 로 두어 댓글 번호와 헷갈리지 않게 한다 (47강).
+  - 상태 반영은 이전처럼 함수형 업데이트(`setPostComments(prev => ...)`)다. 강의 코드는 훅 바깥 값 `postComments` 로 새 목록을 만든다.
+  - 테스트는 바꾸지 않았다. 바뀐 파일은 Prettier 로 정리했다.
   - 결과 : 테스트 42개 통과.
