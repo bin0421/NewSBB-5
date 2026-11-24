@@ -475,7 +475,7 @@
 
 ### 017-2 댓글 여러 줄 표시
 
-- **[링크](LINK:017-2)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/4709f197b84ce1a300702451256410654867cace)**
 - **원인** : 017-1 테스트가 실패한다. 댓글 내용에 `white-space` 설정이 없다.
 - **작업**
   - 수정 : `PostCommentListItem`
