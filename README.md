@@ -380,7 +380,7 @@
 
 ### 014 댓글 usePostComments 훅 분리
 
-- **[링크](LINK:014)**
+- **[링크](https://github.com/bin0421/NewSBB-5/commit/8019a0d107cedbfb91428f169ded925e2de95c98)**
 - **원인** : 39강. `PostCommentSection` 한 컴포넌트에 댓글 상태·API 호출·상태 반영과 폼·목록 화면이 섞여 있다. 댓글 수정(016)을 더하기 전에 데이터 로직을 떼어 둔다.
 - **작업**
   - 추가 : 훅 `usePostComments(postId)` (`src/hooks/usePostComments.ts`) — `postComments` 상태, `writeComment(content)`, `deleteComment(commentId)`
@@ -392,4 +392,21 @@
   - 함수들은 `postId` 를 기억하므로(클로저) 인자로 받지 않는다 (46강). 글 번호를 뜻하는 매개변수 이름은 `id` 가 아니라 `postId` 로 두어 댓글 번호와 헷갈리지 않게 한다 (47강).
   - 상태 반영은 이전처럼 함수형 업데이트(`setPostComments(prev => ...)`)다. 강의 코드는 훅 바깥 값 `postComments` 로 새 목록을 만든다.
   - 테스트는 바꾸지 않았다. 바뀐 파일은 Prettier 로 정리했다.
+  - 결과 : 테스트 42개 통과.
+
+### 015 댓글 작성 폼·목록·항목 컴포넌트 분리
+
+- **[링크](LINK:015)**
+- **원인** : 37·44·48강. `PostCommentSection` 에 작성 폼과 목록, 댓글 한 건의 버튼 처리가 한데 있다. 댓글 수정(016)은 댓글 한 건마다 수정 모드 상태가 필요하므로, 댓글 한 건을 자기 상태를 가질 수 있는 컴포넌트로 먼저 떼어야 한다.
+- **작업**
+  - 추가 : `PostCommentWrite({ writeComment })` — 작성 폼, 검사, 성공 알림, 입력 칸 비우기
+  - 추가 : `PostCommentList({ postComments, deleteComment })` — 로딩중·댓글 없음·목록
+  - 추가 : `PostCommentListItem({ comment, deleteComment })` — 댓글 한 건, 삭제 확인·알림
+  - 수정 : `PostCommentSection`
+    - 이전 : 폼·목록·삭제 처리를 직접 그림
+    - 이후 : `usePostComments` 결과에서 `PostCommentWrite` 와 `PostCommentList` 에 필요한 것만 넘긴다
+- **설명**
+  - 강의는 훅 결과 객체를 통째로 넘기고 타입을 `ReturnType<typeof usePostComments>` 로 맞춘다 (41·42강). 여기서는 각 컴포넌트가 실제로 쓰는 값·함수만 props 로 받는다. 컴포넌트가 훅에 묶이지 않아 props 만 보고 무엇에 의존하는지 알 수 있고, 다른 데이터 출처로도 쓸 수 있다.
+  - 함수 props 타입은 `(commentId: number) => Promise<RsData<unknown>>` 처럼 쓰는 부분(`msg`)만 요구한다.
+  - 테스트는 바꾸지 않았다.
   - 결과 : 테스트 42개 통과.
